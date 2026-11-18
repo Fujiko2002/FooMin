@@ -625,15 +625,21 @@
   <!-- Falling Japanese Maple Leaves (Acer palmatum) -->
   <div class="momiji-fall" id="momiji-fall" aria-hidden="true"></div>
 
-  <!-- Relaxing Background Music Toggle -->
+   <!-- Relaxing Background Music Toggle -->
   <button type="button" class="music-toggle" id="music-toggle" aria-pressed="false">
     <span class="music-bars" aria-hidden="true">
       <span class="music-bar"></span>
       <span class="music-bar"></span>
       <span class="music-bar"></span>
     </span>
-    <span id="music-label">เปิดเพลงผ่อนคลาย</span>
+    <span id="music-label">เปิดเพลง</span>
   </button>
+
+  <!-- จุดเชื่อมไฟล์เพลงเต็ม (.mp3):
+       1. วางไฟล์เพลง .mp3 ไว้ในโฟลเดอร์เดียวกับไฟล์ index.html (แนะนำให้ตั้งชื่อสั้นๆ ไม่มีเว้นวรรค เช่น halleys-comet.mp3)
+       2. เติมแอตทริบิวต์ src="halleys-comet.mp3" เข้าไปในแท็ก audio (id="birthday-audio") ด้านล่างนี้ได้เลย
+       3. (ทางเลือก) สามารถลบบล็อกข้อมูลเสียงตัวอย่าง id="app-data" ถัดลงไปออกได้เพื่อให้ขนาดไฟล์เว็บเล็กลง -->
+  <audio id="birthday-audio" src="halleys-comet.mp3" preload="auto" loop playsinline></audio>
 
   <header class="hero">
     <div class="stars-layer" aria-hidden="true"></div>
