@@ -1,0 +1,1340 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>เครื่องคำนวณอัตราแลกเปลี่ยน USD / THB</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface-subtle: #f8fafc;
+      --border: #dde3ea;
+      --border-strong: #cbd5e1;
+      --ink: #0f172a;
+      --muted: #475569;
+      --brand: #1d4ed8;
+      --brand-hover: #1e40af;
+      --brand-soft: #eff6ff;
+      --brand-border: #bfdbfe;
+      --buy-ink: #065f46;
+      --buy-bg: #ecfdf5;
+      --buy-border: #a7f3d0;
+      --buy-btn: #059669;
+      --buy-btn-hover: #047857;
+      --sell-ink: #9a3412;
+      --sell-bg: #fff7ed;
+      --sell-border: #fed7aa;
+      --sell-btn: #ea580c;
+      --sell-btn-hover: #c2410c;
+      --yellow-input: #fef9c3;
+      --yellow-border: #eab308;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --font: "Sarabun", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: var(--space-6);
+    }
+
+    /* Header */
+    .page-header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: var(--space-6);
+      box-shadow: var(--shadow);
+      margin-bottom: var(--space-6);
+    }
+
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-title {
+      margin: 0 0 var(--space-1) 0;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    .page-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .rate-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+      background: var(--brand-soft);
+      border: 1px solid var(--brand-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .rate-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .rate-label {
+      font-weight: 600;
+      color: #1e3a8a;
+      font-size: 14px;
+    }
+
+    .rate-input {
+      width: 145px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1.5px solid var(--yellow-border);
+      background: var(--yellow-input);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      text-align: right;
+    }
+
+    .rate-input:focus {
+      outline: 2px solid var(--brand);
+      background: #ffffff;
+    }
+
+    .backup-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .backup-badge strong {
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background-color 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--brand);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-hover);
+    }
+
+    .btn-buy {
+      background: var(--buy-btn);
+      color: #ffffff;
+      font-size: 15px;
+      padding: 11px 20px;
+    }
+
+    .btn-buy:hover {
+      background: var(--buy-btn-hover);
+    }
+
+    .btn-sell {
+      background: var(--sell-btn);
+      color: #ffffff;
+      font-size: 15px;
+      padding: 11px 20px;
+    }
+
+    .btn-sell:hover {
+      background: var(--sell-btn-hover);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--ink);
+      border-color: var(--border-strong);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-subtle);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    /* Main Interactive Calculators Grid */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+
+    @media (max-width: 640px) {
+      .calc-grid {
+        grid-template-columns: 1fr;
+      }
+      .container {
+        padding: var(--space-4);
+      }
+    }
+
+    .calc-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .calc-card.buy-card {
+      border-top: 4px solid var(--buy-btn);
+    }
+
+    .calc-card.sell-card {
+      border-top: 4px solid var(--sell-btn);
+    }
+
+    .calc-card-header {
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .buy-card .calc-card-header {
+      background: var(--buy-bg);
+    }
+
+    .sell-card .calc-card-header {
+      background: var(--sell-bg);
+    }
+
+    .calc-card-title {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .buy-card .calc-card-title {
+      color: var(--buy-ink);
+    }
+
+    .sell-card .calc-card-title {
+      color: var(--sell-ink);
+    }
+
+    .calc-tag {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+    }
+
+    .calc-card-body {
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    /* Mode Selector Tabs (2 ways to buy / 2 ways to sell) */
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2);
+      background: var(--surface-subtle);
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .mode-btn {
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .mode-btn:hover {
+      color: var(--ink);
+    }
+
+    .buy-card .mode-btn.active {
+      background: #ffffff;
+      color: var(--buy-ink);
+      border-color: var(--buy-border);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    .sell-card .mode-btn.active {
+      background: #ffffff;
+      color: var(--sell-ink);
+      border-color: var(--sell-border);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .input-hint {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .input-row {
+      display: flex;
+      gap: var(--space-2);
+      align-items: stretch;
+    }
+
+    .number-input-wrap {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .calc-input {
+      width: 100%;
+      padding: 11px 64px 11px 14px;
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      background: var(--yellow-input);
+      border: 1.5px solid var(--yellow-border);
+      border-radius: var(--radius-sm);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .calc-input:focus {
+      outline: 2px solid var(--brand);
+      background: #ffffff;
+    }
+
+    .unit-suffix {
+      position: absolute;
+      right: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.85);
+      padding: 2px 6px;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .tier-select {
+      width: 100%;
+      padding: 9px 12px;
+      font-family: inherit;
+      font-size: 14px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      color: var(--ink);
+    }
+
+    /* Calculation Result Box */
+    .result-box {
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+    }
+
+    .buy-card .result-box {
+      background: #f0fdf4;
+      border-color: var(--buy-border);
+    }
+
+    .sell-card .result-box {
+      background: #fffaf5;
+      border-color: var(--sell-border);
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+
+    @media (max-width: 480px) {
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .result-item {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+    }
+
+    .result-item-label {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .result-item-value {
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      word-break: break-word;
+    }
+
+    .result-item-value.highlight-buy {
+      color: var(--buy-ink);
+    }
+
+    .result-item-value.highlight-sell {
+      color: var(--sell-ink);
+    }
+
+    .result-item-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .result-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-2);
+      font-size: 13px;
+      color: var(--muted);
+      padding-top: var(--space-2);
+      border-top: 1px dashed var(--border-strong);
+    }
+
+    .result-meta strong {
+      color: var(--ink);
+    }
+
+    /* Section Card for Tables */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: var(--surface-subtle);
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+      border-bottom: 2px solid var(--border-strong);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tier-badge {
+      display: inline-block;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: var(--brand-soft);
+      color: #1e3a8a;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .table-yellow-input {
+      width: 120px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      border: 1.5px solid var(--yellow-border);
+      background: var(--yellow-input);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .table-yellow-input:focus {
+      outline: 2px solid var(--brand);
+      background: #ffffff;
+    }
+
+    .cell-action-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .computed-val {
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .computed-val.buy-color {
+      color: var(--buy-ink);
+    }
+
+    .computed-val.sell-color {
+      color: var(--sell-ink);
+    }
+
+    /* Footnotes & Instructions */
+    .notes-box {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+
+    .notes-box p {
+      margin: 0 0 6px 0;
+    }
+
+    .notes-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .guide-list {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .guide-list li strong {
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header & Current Exchange Rate -->
+    <header class="page-header">
+      <div class="header-top">
+        <div>
+          <h1 class="page-title">เครื่องคำนวณอัตราแลกเปลี่ยน USD / THB</h1>
+          <p class="page-subtitle">สูตรค่าธรรมเนียม: เรทปัจจุบัน × Fee (USD ต่อ 1 USD) แล้วนำไปบวก/ลบกับเรทปัจจุบัน</p>
+        </div>
+        <div class="rate-bar">
+          <div class="rate-item">
+            <label class="rate-label" for="baseRateInput">USD/THB ปัจจุบัน:</label>
+            <input type="number" id="baseRateInput" class="rate-input" value="33.874983" step="0.000001" min="0.000001">
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" id="applyRateBtn">คำนวณเรท</button>
+          <div class="backup-badge">
+            <span>เรทสำรอง:</span>
+            <strong>33.874983</strong>
+            <button type="button" class="btn btn-secondary btn-sm" id="resetBackupRateBtn">ใช้เรทสำรอง</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="notes-box">
+        <p><strong>ความหมาย:</strong> Fee 0.10/$ = ค่าธรรมเนียม 0.10 USD ต่อ 1 USD (10% ของเรท); 0.06/$ = 6%; 0.03/$ = 3%</p>
+        <p><strong>สูตรเรทซื้อ–ขาย:</strong> เรทซื้อ = เรทตลาด + (เรทตลาด × Fee) &nbsp;|&nbsp; เรทขาย = เรทตลาด − (เรทตลาด × Fee)</p>
+      </div>
+    </header>
+
+    <!-- Interactive Dual Calculator: Buy USD (2 modes) & Sell USD (2 modes) -->
+    <section class="calc-grid" aria-label="เครื่องคำนวณซื้อและขายดอลลาร์">
+      <!-- 1. BUY USD CARD -->
+      <div class="calc-card buy-card">
+        <div class="calc-card-header">
+          <h2 class="calc-card-title">กรณีซื้อ USD (คำนวณได้ทั้ง 2 แบบ)</h2>
+          <span class="calc-tag">ใช้เรทซื้อ USD</span>
+        </div>
+        <div class="calc-card-body">
+          <div class="mode-switch" role="tablist" aria-label="รูปแบบการซื้อ USD">
+            <button type="button" class="mode-btn active" id="buyModeThbBtn" data-mode="thb">
+              แบบที่ 1: ระบุงบเงินบาท (THB)<br><small>คำนวณดอลลาร์ (USD) ที่ได้รับ</small>
+            </button>
+            <button type="button" class="mode-btn" id="buyModeUsdBtn" data-mode="usd">
+              แบบที่ 2: ระบุจำนวนดอลลาร์ (USD)<br><small>คำนวณเงินบาท (THB) ที่ต้องจ่าย</small>
+            </button>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="buyAmountInput">
+              <span id="buyInputLabelText">กรอกงบเงินบาทที่ต้องการซื้อ (THB)</span>
+              <span class="input-hint">ช่องสีเหลืองกรอกตัวเลขได้</span>
+            </label>
+            <div class="input-row">
+              <div class="number-input-wrap">
+                <input type="number" id="buyAmountInput" class="calc-input" value="1000" step="any" min="0">
+                <span class="unit-suffix" id="buyInputUnit">THB</span>
+              </div>
+              <button type="button" class="btn btn-buy" id="calcBuyBtn">คำนวณ</button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="buyTierSelect">
+              <span>ช่วงยอดธุรกรรม (อัตราค่าธรรมเนียม)</span>
+            </label>
+            <select id="buyTierSelect" class="tier-select">
+              <option value="auto">เลือกตามช่วงยอดธุรกรรม USD อัตโนมัติ</option>
+              <option value="0">1–30 USD (Fee 0.10 USD ต่อ 1 USD / 10%)</option>
+              <option value="1">31–100 USD (Fee 0.06 USD ต่อ 1 USD / 6%)</option>
+              <option value="2">มากกว่า 100 USD (Fee 0.03 USD ต่อ 1 USD / 3%)</option>
+            </select>
+          </div>
+
+          <div class="result-box" id="buyResultBox">
+            <div class="result-grid">
+              <div class="result-item">
+                <div class="result-item-label">ต้องจ่ายเงินบาท (THB)</div>
+                <div class="result-item-value" id="buyResPayThb">1,000.00 THB</div>
+                <div class="result-item-sub" id="buyResPayThbExact">ค่าตามสูตร: 1000 THB</div>
+              </div>
+              <div class="result-item">
+                <div class="result-item-label">ได้รับเงินดอลลาร์สุทธิ (USD)</div>
+                <div class="result-item-value highlight-buy" id="buyResGetUsd">26.84 USD</div>
+                <div class="result-item-sub" id="buyResGetUsdExact">ค่าตามสูตร: 26.83664547 USD</div>
+              </div>
+            </div>
+            <div class="result-meta">
+              <span>ช่วงยอดที่ใช้: <strong id="buyResTierName">1–30 USD</strong></span>
+              <span>Fee: <strong id="buyResFeeInfo">0.10 ($3.3874983 THB)</strong></span>
+              <span>เรทซื้อ: <strong id="buyResRate">37.2624813 THB/USD</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. SELL USD CARD -->
+      <div class="calc-card sell-card">
+        <div class="calc-card-header">
+          <h2 class="calc-card-title">กรณีขาย USD (คำนวณได้ทั้ง 2 แบบ)</h2>
+          <span class="calc-tag">ใช้เรทขาย USD</span>
+        </div>
+        <div class="calc-card-body">
+          <div class="mode-switch" role="tablist" aria-label="รูปแบบการขาย USD">
+            <button type="button" class="mode-btn active" id="sellModeUsdBtn" data-mode="usd">
+              แบบที่ 1: ระบุจำนวน USD ที่ขาย<br><small>คำนวณเงินบาท (THB) ที่ได้รับ</small>
+            </button>
+            <button type="button" class="mode-btn" id="sellModeThbBtn" data-mode="thb">
+              แบบที่ 2: ระบุจำนวนเงินบาท (THB) ที่ต้องการ<br><small>คำนวณดอลลาร์ (USD) ที่ต้องจ่าย</small>
+            </button>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="sellAmountInput">
+              <span id="sellInputLabelText">กรอกจำนวนดอลลาร์ที่ต้องการขาย (USD)</span>
+              <span class="input-hint">ช่องสีเหลืองกรอกตัวเลขได้</span>
+            </label>
+            <div class="input-row">
+              <div class="number-input-wrap">
+                <input type="number" id="sellAmountInput" class="calc-input" value="20" step="any" min="0">
+                <span class="unit-suffix" id="sellInputUnit">USD</span>
+              </div>
+              <button type="button" class="btn btn-sell" id="calcSellBtn">คำนวณ</button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="sellTierSelect">
+              <span>ช่วงยอดธุรกรรม (อัตราค่าธรรมเนียม)</span>
+            </label>
+            <select id="sellTierSelect" class="tier-select">
+              <option value="auto">เลือกตามช่วงยอดธุรกรรม USD อัตโนมัติ</option>
+              <option value="0">1–30 USD (Fee 0.10 USD ต่อ 1 USD / 10%)</option>
+              <option value="1">31–100 USD (Fee 0.06 USD ต่อ 1 USD / 6%)</option>
+              <option value="2">มากกว่า 100 USD (Fee 0.03 USD ต่อ 1 USD / 3%)</option>
+            </select>
+          </div>
+
+          <div class="result-box" id="sellResultBox">
+            <div class="result-grid">
+              <div class="result-item">
+                <div class="result-item-label">ต้องจ่ายเงินดอลลาร์ (USD)</div>
+                <div class="result-item-value" id="sellResPayUsd">20.00 USD</div>
+                <div class="result-item-sub" id="sellResPayUsdExact">ค่าตามสูตร: 20 USD</div>
+              </div>
+              <div class="result-item">
+                <div class="result-item-label">ได้รับเงินบาทสุทธิ (THB)</div>
+                <div class="result-item-value highlight-sell" id="sellResGetThb">609.75 THB</div>
+                <div class="result-item-sub" id="sellResGetThbExact">ค่าตามสูตร: 609.749694 THB</div>
+              </div>
+            </div>
+            <div class="result-meta">
+              <span>ช่วงยอดที่ใช้: <strong id="sellResTierName">1–30 USD</strong></span>
+              <span>Fee: <strong id="sellResFeeInfo">0.10 ($3.3874983 THB)</strong></span>
+              <span>เรทขาย: <strong id="sellResRate">30.4874847 THB/USD</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Table 1: อัตราค่าธรรมเนียมตามยอดธุรกรรม -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">ตารางที่ 1: อัตราค่าธรรมเนียมตามยอดธุรกรรม</h2>
+        <span class="page-subtitle">คำนวณอัตโนมัติจาก USD/THB ปัจจุบัน</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ช่วงยอดธุรกรรม</th>
+              <th class="num">Fee (USD ต่อ 1 USD)</th>
+              <th class="num">Fee คิดเป็น THB</th>
+              <th class="num">เรทซื้อ USD</th>
+              <th class="num">เรทขาย USD</th>
+            </tr>
+          </thead>
+          <tbody id="feeTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Table 2: กรณีซื้อ USD (ตารางตามไฟล์ Excel พร้อมช่องสีเหลืองและปุ่มคำนวณ) -->
+    <section class="section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">ตารางที่ 2: กรณีซื้อ USD (แก้ไขช่องสีเหลืองและกดคำนวณได้ทั้ง 2 แบบ)</h2>
+          <p class="page-subtitle">ฝั่งซ้าย: กรอกงบเงินบาท (THB) เพื่อดู USD สุทธิ &nbsp;|&nbsp; ฝั่งขวา: กรอกงบเงินดอลล่า (USD) เพื่อดูยอดจ่ายด้วยเงินบาท (THB)</p>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-buy btn-sm" id="calcAllBuyTableBtn">คำนวณตารางซื้อทั้งหมด</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="resetBuyTableBtn">คืนค่าตัวอย่างตามไฟล์</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ช่วงยอด</th>
+              <th class="num">เรทซื้อ (THB/USD)</th>
+              <th class="num">งบเงินบาท (THB)</th>
+              <th class="num">ได้รับ USD สุทธิ</th>
+              <th class="num">งบเงินดอลล่า (USD)</th>
+              <th class="num">จ่ายด้วยเงินบาท (THB)</th>
+              <th class="num">คำนวณ</th>
+            </tr>
+          </thead>
+          <tbody id="buyTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Table 3: กรณีขาย USD (ตารางตามไฟล์ Excel พร้อมช่องสีเหลืองและปุ่มคำนวณ) -->
+    <section class="section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">ตารางที่ 3: กรณีขาย USD (แก้ไขช่องสีเหลืองและกดคำนวณได้ทั้ง 2 แบบ)</h2>
+          <p class="page-subtitle">ฝั่งซ้าย: กรอกจำนวน USD ที่ขาย เพื่อดูเงินบาทสุทธิ &nbsp;|&nbsp; ฝั่งขวา: กรอกจำนวน THB ที่ต้องการ เพื่อดูจำนวน USD ที่ต้องจ่าย</p>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-sell btn-sm" id="calcAllSellTableBtn">คำนวณตารางขายทั้งหมด</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="resetSellTableBtn">คืนค่าตัวอย่างตามไฟล์</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ช่วงยอด</th>
+              <th class="num">เรทขาย (THB/USD)</th>
+              <th class="num">จำนวน USD ที่ขาย</th>
+              <th class="num">ได้รับเงินบาทสุทธิ</th>
+              <th class="num">จำนวน THB ที่ต้องการ</th>
+              <th class="num">จำนวน USD ที่ต้องจ่าย</th>
+              <th class="num">คำนวณ</th>
+            </tr>
+          </thead>
+          <tbody id="sellTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Sheet 2: วิธีใช้งานและสูตรคำนวณ -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">วิธีใช้งานและสูตรคำนวณ (จากชีต วิธีใช้งาน)</h2>
+      </div>
+      <ol class="guide-list">
+        <li><strong>อัตราแลกเปลี่ยน:</strong> ช่อง B3 ดึง USD/THB จาก GOOGLEFINANCE หากดึงไม่ได้จะใช้เรทสำรองใน C3 (33.874983)</li>
+        <li><strong>Fee:</strong> 0.10/$, 0.06/$ และ 0.03/$ หมายถึงค่าธรรมเนียมเป็น USD ต่อ 1 USD หรือ 10%, 6%, 3% ของเรท</li>
+        <li><strong>แปลง Fee เป็นบาท:</strong> Fee (THB) = USD/THB ปัจจุบัน × Fee (USD ต่อ 1 USD) เช่น 33.90 × 0.10 = 3.39 บาทต่อ USD</li>
+        <li><strong>เรทซื้อ:</strong> เรทซื้อ = เรทปัจจุบัน + Fee ที่แปลงเป็นบาท เช่น 33.90 + 3.39 = 37.29 THB/USD</li>
+        <li><strong>เรทขาย:</strong> เรทขาย = เรทปัจจุบัน − Fee ที่แปลงเป็นบาท เช่น 33.90 − 3.39 = 30.51 THB/USD</li>
+        <li><strong>เลือกช่วง Fee:</strong> เลือกตามยอดธุรกรรม USD: 1–30 ใช้ 0.10; 31–100 ใช้ 0.06; มากกว่า 100 ใช้ 0.03</li>
+        <li><strong>แก้ไขตัวอย่าง:</strong> แก้ช่องสีเหลืองในชีตเครื่องคำนวณเพื่อเปลี่ยนยอดเงินบาทหรือจำนวน USD</li>
+      </ol>
+      <div class="notes-box" style="margin-top: 16px;">
+        <p><strong>หมายเหตุ:</strong> ตัวอย่างยอดเงินเป็นข้อมูลทดลอง แก้ช่องสีเหลืองได้ และตรวจสอบเรทจริงก่อนทำธุรกรรม GOOGLEFINANCE อาจมีความล่าช้า</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const BACKUP_RATE = 33.874983;
+
+      const TIERS = [
+        { id: 0, label: "1–30 USD", feeUsd: 0.10, minUsd: 0, maxUsd: 30 },
+        { id: 1, label: "31–100 USD", feeUsd: 0.06, minUsd: 30, maxUsd: 100 },
+        { id: 2, label: "มากกว่า 100 USD", feeUsd: 0.03, minUsd: 100, maxUsd: Infinity }
+      ];
+
+      // Default values from Excel sheet "เครื่องคำนวณ"
+      const DEFAULT_BUY_ROWS = [
+        { budgetThb: 1000, budgetUsd: 20 },
+        { budgetThb: 3000, budgetUsd: 90 },
+        { budgetThb: 5000, budgetUsd: 200 }
+      ];
+
+      const DEFAULT_SELL_ROWS = [
+        { sellUsd: 20, targetThb: 900 },
+        { sellUsd: 90, targetThb: 3000 },
+        { sellUsd: 200, targetThb: 10000 }
+      ];
+
+      let baseRate = BACKUP_RATE;
+      let buyMode = "thb"; // "thb" = กรอกงบเงินบาท, "usd" = กรอกงบเงินดอลล่า
+      let sellMode = "usd"; // "usd" = กรอกจำนวน USD ที่ขาย, "thb" = กรอกจำนวน THB ที่ต้องการ
+
+      let buyRowsState = DEFAULT_BUY_ROWS.map(r => ({ ...r }));
+      let sellRowsState = DEFAULT_SELL_ROWS.map(r => ({ ...r }));
+
+      // Formatters
+      function fmtExact(num, maxDecimals = 8) {
+        if (!Number.isFinite(num)) return "0";
+        return Number(num.toFixed(maxDecimals)).toLocaleString("en-US", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: maxDecimals
+        });
+      }
+
+      function fmtMoney(num) {
+        if (!Number.isFinite(num)) return "0.00";
+        return num.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+
+      function getComputedTiers(rate) {
+        return TIERS.map(t => {
+          const feeThb = rate * t.feeUsd;
+          const buyRate = rate + feeThb;
+          const sellRate = rate - feeThb;
+          return {
+            ...t,
+            feeThb,
+            buyRate,
+            sellRate
+          };
+        });
+      }
+
+      // Determine tier automatically based on USD amount (or THB converted to USD)
+      function pickTierByUsd(usdAmount, computedTiers) {
+        if (usdAmount <= 30) return computedTiers[0];
+        if (usdAmount <= 100) return computedTiers[1];
+        return computedTiers[2];
+      }
+
+      function pickBuyTierForThbBudget(thbBudget, computedTiers) {
+        // Check which tier's resulting USD matches its range
+        const usdAtTier0 = thbBudget / computedTiers[0].buyRate;
+        if (usdAtTier0 <= 30) return computedTiers[0];
+        const usdAtTier1 = thbBudget / computedTiers[1].buyRate;
+        if (usdAtTier1 <= 100) return computedTiers[1];
+        return computedTiers[2];
+      }
+
+      function pickSellTierForTargetThb(targetThb, computedTiers) {
+        const usdAtTier0 = targetThb / computedTiers[0].sellRate;
+        if (usdAtTier0 <= 30) return computedTiers[0];
+        const usdAtTier1 = targetThb / computedTiers[1].sellRate;
+        if (usdAtTier1 <= 100) return computedTiers[1];
+        return computedTiers[2];
+      }
+
+      // Update Top Buy Calculator
+      function calculateBuyCard() {
+        const computedTiers = getComputedTiers(baseRate);
+        const rawVal = parseFloat(document.getElementById("buyAmountInput").value);
+        const amount = Number.isFinite(rawVal) && rawVal >= 0 ? rawVal : 0;
+        const tierChoice = document.getElementById("buyTierSelect").value;
+
+        let chosenTier;
+        if (tierChoice === "auto") {
+          chosenTier = buyMode === "thb"
+            ? pickBuyTierForThbBudget(amount, computedTiers)
+            : pickTierByUsd(amount, computedTiers);
+        } else {
+          chosenTier = computedTiers[parseInt(tierChoice, 10)] || computedTiers[0];
+        }
+
+        let payThb = 0;
+        let getUsd = 0;
+
+        if (buyMode === "thb") {
+          payThb = amount;
+          getUsd = amount / chosenTier.buyRate;
+        } else {
+          getUsd = amount;
+          payThb = amount * chosenTier.buyRate;
+        }
+
+        document.getElementById("buyResPayThb").textContent = fmtMoney(payThb) + " THB";
+        document.getElementById("buyResPayThbExact").textContent = "ค่าตามสูตร: " + fmtExact(payThb, 6) + " THB";
+        document.getElementById("buyResGetUsd").textContent = fmtMoney(getUsd) + " USD";
+        document.getElementById("buyResGetUsdExact").textContent = "ค่าตามสูตร: " + fmtExact(getUsd, 8) + " USD";
+        document.getElementById("buyResTierName").textContent = chosenTier.label;
+        document.getElementById("buyResFeeInfo").textContent =
+          chosenTier.feeUsd.toFixed(2) + " (" + fmtExact(chosenTier.feeThb, 7) + " THB)";
+        document.getElementById("buyResRate").textContent = fmtExact(chosenTier.buyRate, 7) + " THB/USD";
+      }
+
+      // Update Top Sell Calculator
+      function calculateSellCard() {
+        const computedTiers = getComputedTiers(baseRate);
+        const rawVal = parseFloat(document.getElementById("sellAmountInput").value);
+        const amount = Number.isFinite(rawVal) && rawVal >= 0 ? rawVal : 0;
+        const tierChoice = document.getElementById("sellTierSelect").value;
+
+        let chosenTier;
+        if (tierChoice === "auto") {
+          chosenTier = sellMode === "usd"
+            ? pickTierByUsd(amount, computedTiers)
+            : pickSellTierForTargetThb(amount, computedTiers);
+        } else {
+          chosenTier = computedTiers[parseInt(tierChoice, 10)] || computedTiers[0];
+        }
+
+        let payUsd = 0;
+        let getThb = 0;
+
+        if (sellMode === "usd") {
+          payUsd = amount;
+          getThb = amount * chosenTier.sellRate;
+        } else {
+          getThb = amount;
+          payUsd = amount / chosenTier.sellRate;
+        }
+
+        document.getElementById("sellResPayUsd").textContent = fmtMoney(payUsd) + " USD";
+        document.getElementById("sellResPayUsdExact").textContent = "ค่าตามสูตร: " + fmtExact(payUsd, 8) + " USD";
+        document.getElementById("sellResGetThb").textContent = fmtMoney(getThb) + " THB";
+        document.getElementById("sellResGetThbExact").textContent = "ค่าตามสูตร: " + fmtExact(getThb, 6) + " THB";
+        document.getElementById("sellResTierName").textContent = chosenTier.label;
+        document.getElementById("sellResFeeInfo").textContent =
+          chosenTier.feeUsd.toFixed(2) + " (" + fmtExact(chosenTier.feeThb, 7) + " THB)";
+        document.getElementById("sellResRate").textContent = fmtExact(chosenTier.sellRate, 7) + " THB/USD";
+      }
+
+      // Render Table 1: Fee Structure
+      function renderFeeTable() {
+        const computedTiers = getComputedTiers(baseRate);
+        const tbody = document.getElementById("feeTableBody");
+        tbody.innerHTML = computedTiers.map(t => `
+          <tr>
+            <td><span class="tier-badge">${t.label}</span></td>
+            <td class="num">${t.feeUsd}</td>
+            <td class="num">${fmtExact(t.feeThb, 8)}</td>
+            <td class="num computed-val buy-color">${fmtExact(t.buyRate, 8)}</td>
+            <td class="num computed-val sell-color">${fmtExact(t.sellRate, 8)}</td>
+          </tr>
+        `).join("");
+      }
+
+      // Render Table 2: Buy USD Table
+      function renderBuyTable() {
+        const computedTiers = getComputedTiers(baseRate);
+        const tbody = document.getElementById("buyTableBody");
+        tbody.innerHTML = computedTiers.map((t, idx) => {
+          const row = buyRowsState[idx];
+          const netUsd = row.budgetThb / t.buyRate;
+          const payThb = row.budgetUsd * t.buyRate;
+          return `
+            <tr>
+              <td><span class="tier-badge">${t.label}</span></td>
+              <td class="num">${fmtExact(t.buyRate, 8)}</td>
+              <td class="num">
+                <input type="number" class="table-yellow-input buy-thb-input" data-idx="${idx}" value="${row.budgetThb}" step="any" min="0" aria-label="งบเงินบาท ช่วง ${t.label}">
+              </td>
+              <td class="num computed-val buy-color" id="buyNetUsdCell-${idx}">
+                ${fmtExact(netUsd, 8)}
+                <div style="font-size:12px;color:var(--muted);font-weight:400;">(${fmtMoney(netUsd)} USD)</div>
+              </td>
+              <td class="num">
+                <input type="number" class="table-yellow-input buy-usd-input" data-idx="${idx}" value="${row.budgetUsd}" step="any" min="0" aria-label="งบเงินดอลล่า ช่วง ${t.label}">
+              </td>
+              <td class="num computed-val buy-color" id="buyPayThbCell-${idx}">
+                ${fmtExact(payThb, 6)}
+                <div style="font-size:12px;color:var(--muted);font-weight:400;">(${fmtMoney(payThb)} THB)</div>
+              </td>
+              <td class="num">
+                <button type="button" class="btn btn-buy btn-sm calc-buy-row-btn" data-idx="${idx}">คำนวณ</button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+        tbody.querySelectorAll(".calc-buy-row-btn").forEach(btn => {
+          btn.addEventListener("click", function () {
+            syncAndCalcBuyTable();
+          });
+        });
+
+        tbody.querySelectorAll(".table-yellow-input").forEach(inp => {
+          inp.addEventListener("input", function () {
+            syncAndCalcBuyTable();
+          });
+        });
+      }
+
+      function syncAndCalcBuyTable() {
+        const computedTiers = getComputedTiers(baseRate);
+        document.querySelectorAll(".buy-thb-input").forEach(inp => {
+          const idx = parseInt(inp.getAttribute("data-idx"), 10);
+          const val = parseFloat(inp.value);
+          buyRowsState[idx].budgetThb = Number.isFinite(val) && val >= 0 ? val : 0;
+        });
+        document.querySelectorAll(".buy-usd-input").forEach(inp => {
+          const idx = parseInt(inp.getAttribute("data-idx"), 10);
+          const val = parseFloat(inp.value);
+          buyRowsState[idx].budgetUsd = Number.isFinite(val) && val >= 0 ? val : 0;
+        });
+
+        computedTiers.forEach((t, idx) => {
+          const row = buyRowsState[idx];
+          const netUsd = row.budgetThb / t.buyRate;
+          const payThb = row.budgetUsd * t.buyRate;
+          const cellUsd = document.getElementById(`buyNetUsdCell-${idx}`);
+          const cellThb = document.getElementById(`buyPayThbCell-${idx}`);
+          if (cellUsd) {
+            cellUsd.innerHTML = `${fmtExact(netUsd, 8)}<div style="font-size:12px;color:var(--muted);font-weight:400;">(${fmtMoney(netUsd)} USD)</div>`;
+          }
+          if (cellThb) {
+            cellThb.innerHTML = `${fmtExact(payThb, 6)}<div style="font-size:12px;color:var(--muted);font-weight:400;">(${fmtMoney(payThb)} THB)</div>`;
+          }
+        });
+      }
+
+      // Render Table 3: Sell USD Table
+      function renderSellTable() {
+        const computedTiers = getComputedTiers(baseRate);
+        const tbody = document.getElementById("sellTableBody");
+        tbody.innerHTML = computedTiers.map((t, idx) => {
+          const row = sellRowsState[idx];
+          const netThb = t.sellRate * row.sellUsd;
+          const payUsd = row.targetThb / t.sellRate;
+          return `
+            <tr>
+              <td><span class="tier-badge">${t.label}</span></td>
+              <td class="num">${fmtExact(t.sellRate, 8)}</td>
+              <td class="num">
+                <input type="number" class="table-yellow-input sell-usd-input" data-idx="${idx}" value="${row.sellUsd}" step="any" min="0" aria-label="จำนวน USD ที่ขาย ช่วง ${t.label}">
+              </td>
+              <td class="num computed-val sell-color" id="sellNetThbCell-${idx}">
+                ${fmtExact(netThb, 6)}
+                <div style="font-size:12px;color:var(--muted);font-weight:400;">(${fmtMoney(netThb)} THB)</div>
+              </td>
+              <td class="num">
+                <input type="number" class="table-yellow-input sell-thb-input" data-idx="${idx}" value="${row.targetThb}" step="any" min="0" aria-label="จำนวน THB ที่ต้องการ ช่วง ${t.label}">
+              </td>
+              <td class="num computed-val sell-color" id="sellPayUsdCell-${idx}">
+                ${fmtExact(payUsd, 8)}
+                <div style="font-size:12px;color:var(--muted);font-weight:400;">(${fmtMoney(payUsd)} USD)</div>
+              </td>
+              <td class="num">
+                <button type="button" class="btn btn-sell btn-sm calc-sell-row-btn" data-idx="${idx}">คำนวณ</button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+        tbody.querySelectorAll(".calc-sell-row-btn").forEach(btn => {
+          btn.addEventListener("click", function () {
+            syncAndCalcSellTable();
+          });
+        });
+
+        tbody.querySelectorAll(".table-yellow-input").forEach(inp => {
+          inp.addEventListener("input", function () {
+            syncAndCalcSellTable();
+          });
+        });
+      }
+
+      function syncAndCalcSellTable() {
+        const computedTiers = getComputedTiers(baseRate);
+        document.querySelectorAll(".sell-usd-input").forEach(inp => {
+          const idx = parseInt(inp.getAttribute("data-idx"), 10);
+          const val = parseFloat(inp.value);
+          sellRowsState[idx].sellUsd = Number.isFinite(val) && val >= 0 ? val : 0;
+        });
+        document.querySelectorAll(".sell-thb-input").forEach(inp => {
+          const idx = parseInt(inp.getAttribute("data-idx"), 10);
+          const val = parseFloat(inp.value);
+          sellRowsState[idx].targetThb = Number.isFinite(val) && val >= 0 ? val : 0;
+        });
+
+        computedTiers.forEach((t, idx) => {
+          const row = sellRowsState[idx];
+          const netThb = t.sellRate * row.sellUsd;
+          const payUsd = row.targetThb / t.sellRate;
+          const cellThb = document.getElementById(`sellNetThbCell-${idx}`);
+          const cellUsd = document.getElementById(`sellPayUsdCell-${idx}`);
+          if (cellThb) {
+            cellThb.innerHTML = `${fmtExact(netThb, 6)}<div style="font-size:12px;color:var(--muted);font-weight:400;">(${fmtMoney(netThb)} THB)</div>`;
+          }
+          if (cellUsd) {
+            cellUsd.innerHTML = `${fmtExact(payUsd, 8)}<div style="font-size:12px;color:var(--muted);font-weight:400;">(${fmtMoney(payUsd)} USD)</div>`;
+          }
+        });
+      }
+
+      function refreshAll() {
+        const val = parseFloat(document.getElementById("baseRateInput").value);
+        if (Number.isFinite(val) && val > 0) {
+          baseRate = val;
+        }
+        renderFeeTable();
+        renderBuyTable();
+        renderSellTable();
+        calculateBuyCard();
+        calculateSellCard();
+      }
+
+      // Event Listeners for Rate Bar
+      document.getElementById("applyRateBtn").addEventListener("click", refreshAll);
+      document.getElementById("baseRateInput").addEventListener("input", refreshAll);
+      document.getElementById("resetBackupRateBtn").addEventListener("click", function () {
+        document.getElementById("baseRateInput").value = BACKUP_RATE;
+        refreshAll();
+      });
+
+      // Event Listeners for Buy Mode Switch (2 ways to buy)
+      document.getElementById("buyModeThbBtn").addEventListener("click", function () {
+        buyMode = "thb";
+        this.classList.add("active");
+        document.getElementById("buyModeUsdBtn").classList.remove("active");
+        document.getElementById("buyInputLabelText").textContent = "กรอกงบเงินบาทที่ต้องการซื้อ (THB)";
+        document.getElementById("buyInputUnit").textContent = "THB";
+        document.getElementById("buyAmountInput").value = "1000";
+        calculateBuyCard();
+      });
+
+      document.getElementById("buyModeUsdBtn").addEventListener("click", function () {
+        buyMode = "usd";
+        this.classList.add("active");
+        document.getElementById("buyModeThbBtn").classList.remove("active");
+        document.getElementById("buyInputLabelText").textContent = "กรอกจำนวนดอลลาร์ที่ต้องการซื้อ (USD)";
+        document.getElementById("buyInputUnit").textContent = "USD";
+        document.getElementById("buyAmountInput").value = "20";
+        calculateBuyCard();
+      });
+
+      document.getElementById("calcBuyBtn").addEventListener("click", calculateBuyCard);
+      document.getElementById("buyAmountInput").addEventListener("input", calculateBuyCard);
+      document.getElementById("buyTierSelect").addEventListener("change", calculateBuyCard);
+
+      // Event Listeners for Sell Mode Switch (2 ways to sell)
+      document.getElementById("sellModeUsdBtn").addEventListener("click", function () {
+        sellMode = "usd";
+        this.classList.add("active");
+        document.getElementById("sellModeThbBtn").classList.remove("active");
+        document.getElementById("sellInputLabelText").textContent = "กรอกจำนวนดอลลาร์ที่ต้องการขาย (USD)";
+        document.getElementById("sellInputUnit").textContent = "USD";
+        document.getElementById("sellAmountInput").value = "20";
+        calculateSellCard();
+      });
+
+      document.getElementById("sellModeThbBtn").addEventListener("click", function () {
+        sellMode = "thb";
+        this.classList.add("active");
+        document.getElementById("sellModeUsdBtn").classList.remove("active");
+        document.getElementById("sellInputLabelText").textContent = "กรอกจำนวนเงินบาทที่ต้องการได้รับ (THB)";
+        document.getElementById("sellInputUnit").textContent = "THB";
+        document.getElementById("sellAmountInput").value = "900";
+        calculateSellCard();
+      });
+
+      document.getElementById("calcSellBtn").addEventListener("click", calculateSellCard);
+      document.getElementById("sellAmountInput").addEventListener("input", calculateSellCard);
+      document.getElementById("sellTierSelect").addEventListener("change", calculateSellCard);
+
+      // Table Action Buttons
+      document.getElementById("calcAllBuyTableBtn").addEventListener("click", syncAndCalcBuyTable);
+      document.getElementById("resetBuyTableBtn").addEventListener("click", function () {
+        buyRowsState = DEFAULT_BUY_ROWS.map(r => ({ ...r }));
+        renderBuyTable();
+      });
+
+      document.getElementById("calcAllSellTableBtn").addEventListener("click", syncAndCalcSellTable);
+      document.getElementById("resetSellTableBtn").addEventListener("click", function () {
+        sellRowsState = DEFAULT_SELL_ROWS.map(r => ({ ...r }));
+        renderSellTable();
+      });
+
+      // Initial render
+      refreshAll();
+    })();
+  </script>
+</body>
+</html>
