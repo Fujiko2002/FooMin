@@ -830,9 +830,9 @@
         ageEl.textContent = "อายุ " + ageYears.toLocaleString("th-TH") + " ปี";
       }
 
-      // 2. คำนวณจำนวนวันที่คบกันตั้งแต่วันที่ 14 กุมภาพันธ์ 2024 จนถึงปัจจุบัน
+      // 2. คำนวณจำนวนวันที่คบกันตั้งแต่วันที่ 10 กุมภาพันธ์ 2024 จนถึงปัจจุบัน
       const todayUtc = Date.UTC(currentYear, currentMonth, currentDay);
-      const startUtc = Date.UTC(2024, 1, 14); // 14 กุมภาพันธ์ 2024
+      const startUtc = Date.UTC(2024, 1, 10); // 10 กุมภาพันธ์ 2024
       const diffDays = Math.floor((todayUtc - startUtc) / 86400000);
 
       const daysEl = document.getElementById("days-display");
